@@ -1,8 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Slider.css";
 
 const ImageSlider = () => {
-  // <----------Slide Data----------->
+
+  // <--------------For changing Manually----------------->
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % slideData.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prevSlide) =>
+      prevSlide === 0 ? slideData.length - 1 : prevSlide - 1
+    );
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
+  // <--------------For Changing Automatically ------------>
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      nextSlide();
+    }, 5000); // Change slide every 5 seconds (adjust as needed)
+  
+    return () => clearInterval(intervalId); // Cleanup on component unmount
+  }, [nextSlide]);
+  
+
+
+  // <-------------Slide Data------------->
   const slideData = [
     {
       index: 0,
@@ -30,9 +59,44 @@ const ImageSlider = () => {
     },
   ];
 
+
+// <-----------------XML Content----------------->
   return (
-    <div>
-      <h1>Image Slider</h1>
+    <div className="slider-container">
+
+      <div className="slider">
+        {slideData.map((slide, index) => (
+          <div
+            key={index}
+            className={index === currentSlide ? "slide active" : "slide"}
+          >
+            <img
+              src={slide.src}
+              alt={slide.headline}
+              style={{ width: "100%", height: "100%" }}
+            />
+            <div className="slide-content">
+              <h2>{slide.headline}</h2>
+              <button>{slide.button}</button>
+            </div>
+          </div>
+        ))}
+        <button className="prev" onClick={prevSlide}>
+          &#9665;
+        </button>
+        <button className="next" onClick={nextSlide}>
+          &#9655;
+        </button>
+      </div>
+      <div className="slide-indicators">
+        {slideData.map((_, index) => (
+          <span
+            key={index}
+            className={index === currentSlide ? "indicator active" : "indicator"}
+            onClick={() => goToSlide(index)}
+          ></span>
+        ))}
+      </div>
     </div>
   );
 };
